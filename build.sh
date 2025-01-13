@@ -70,7 +70,7 @@ if [ "$ARCH" = "x86_64" ]; then
 	fi
 elif [ "$ARCH" = "aarch64" ]; then
 	if ! mv ./usr/lib/ld-linux-aarch64.so.1 ./ld-linux.so; then
-		cp -v /lib64/ld-linux-aarch64.so.1 ./ld-linux.so
+		cp -v /usr/lib/ld-linux-aarch64.so.1 ./ld-linux.so
 	fi
 else
 	exit 1
