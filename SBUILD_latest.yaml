@@ -1,0 +1,55 @@
+#!/SBUILD
+#SELF: https://raw.githubusercontent.com/psadi/ghostty-appimage/refs/heads/main/SBUILD_latest.yaml
+_disabled: false
+
+pkg: "ghostty"
+pkg_id: "github.com.psadi.ghostty-appimage.stable"
+pkg_type: "appimage"
+category:
+  - "TerminalEmulator"
+description: "Fast, native, feature-rich terminal emulator pushing modern features"
+distro_pkg:
+  archlinux:
+    aur:
+      - "ghostty-git"
+    extra:
+      - "ghostty"
+  homebrew:
+    - "ghostty"
+  nixpkgs:
+    - "ghostty"
+homepage:
+  - "https://ghostty.org"
+  - "https://github.com/ghostty-org/ghostty"
+maintainer:
+  - "psadi (https://github.com/psadi)"
+note:
+  - "Fetched from Pre Built Community Created AppImage. Check/Report @ https://github.com/psadi/ghostty-appimage"
+license:
+  - id: "MIT"
+    url: "https://github.com/ghostty-org/ghostty/raw/918ccdba5cc65ccd1fb48a54c71306d869299441/LICENSE"
+provides:
+  - "ghostty"
+repology:
+  - "ghostty"
+src_url:
+  - "https://github.com/psadi/ghostty-appimage"
+tag:
+  - "terminal"
+x_exec:
+  host:
+    - "aarch64-Linux"
+    - "x86_64-Linux"
+  shell: "bash"
+  pkgver: |
+    curl -qfsSL "https://api.gh.pkgforge.dev/repos/psadi/ghostty-appimage/releases/latest?per_page=100" | jq -r '.tag_name'
+  run: |
+    #Download
+    case "$(uname -m)" in
+      aarch64)
+        soar dl "https://github.com/psadi/ghostty-appimage@${PKGVER}" --match "appimage,aarch64" --exclude "x64,x86,zsync" -o "./${PKG}" --yes
+        ;;
+      x86_64)
+        soar dl "https://github.com/psadi/ghostty-appimage@${PKGVER}" --match "appimage,x86_64" --exclude "aarch64,arm,zsync" -o "./${PKG}" --yes
+        ;;
+    esac
