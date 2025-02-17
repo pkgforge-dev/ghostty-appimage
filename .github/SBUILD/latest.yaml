@@ -1,5 +1,5 @@
 #!/SBUILD
-#SELF: https://raw.githubusercontent.com/psadi/ghostty-appimage/refs/heads/main/SBUILD_latest.yaml
+#SELF: https://github.com/pkgforge-dev/ghostty-appimage/raw/main/.github/SBUILD/latest.yaml
 _disabled: false
 
 pkg: "ghostty"
