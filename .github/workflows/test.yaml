@@ -1,0 +1,19 @@
+name: 🧰🛠️ Build Soar Package 📦📀
+
+on:
+  #push:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  build-package:
+    uses: pkgforge/soarpkgs/.github/workflows/matrix_builds.yaml@main
+    with:
+      host: "ALL"
+      sbuild-url: "https://raw.githubusercontent.com/pkgforge-dev/ghostty-appimage/refs/heads/main/SBUILD_latest.yaml"
+      ghcr-url: "ghcr.io/${{ env.GITHUB_REPOSITORY }}/stable"
+      pkg-family: "ghostty"
+      debug: false
+      logs: true
+      rebuild: true
