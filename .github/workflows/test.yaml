@@ -12,7 +12,7 @@ jobs:
     with:
       host: "ALL"
       sbuild-url: "https://raw.githubusercontent.com/pkgforge-dev/ghostty-appimage/refs/heads/main/SBUILD_latest.yaml"
-      ghcr-url: "ghcr.io/${{ env.GITHUB_REPOSITORY }}/stable"
+      ghcr-url: "ghcr.io/${{ github.repository }}/stable"
       pkg-family: "ghostty"
       debug: false
       logs: true
