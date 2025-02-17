@@ -1,5 +1,10 @@
 name: 🧰🛠️ Build Soar Package 📦📀
-
+permissions:
+  attestations: write #Needed for Build Provenance & Attestations
+  contents: write #Needed to create Release
+  id-token: write #Needed for Build Provenance & Attestations
+  packages: write #Needed to push to ghcr
+      
 on:
   #push:
   workflow_dispatch:
