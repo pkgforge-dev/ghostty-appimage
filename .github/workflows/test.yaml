@@ -1,4 +1,11 @@
 name: 🧰🛠️ Build Soar Package 📦📀
+
+##Optional:
+# Setup minisign & add the private key as secret: MINISIGN_KEY [${{ secrets.MINISIGN_KEY }}]
+# Setup a Read-Only Underprivileged Github Token as secret: RO_GHTOKEN [${{ secrets.RO_GHTOKEN }}]
+# Setup a Read-Only Underprivileged GitLab Token as secret: RO_GLTOKEN [${{ secrets.RO_GLTOKEN }}]
+
+#These permissions are needed by main CI
 permissions:
   attestations: write #Needed for Build Provenance & Attestations
   contents: write #Needed to create Release
@@ -12,13 +19,14 @@ on:
     types: [published]
 
 jobs:
-  build-package:
+
+  stable-release:
     uses: pkgforge/soarpkgs/.github/workflows/matrix_builds.yaml@main
     with:
-      host: "ALL"
-      sbuild-url: "https://raw.githubusercontent.com/pkgforge-dev/ghostty-appimage/refs/heads/main/SBUILD_latest.yaml"
-      ghcr-url: "ghcr.io/${{ github.repository }}/stable"
-      pkg-family: "ghostty"
-      debug: false
-      logs: true
-      rebuild: true
+      host: "ALL" #Otherwise aarch64-Linux OR x86_64-Linux
+      sbuild-url: "https://github.com/${{ github.repository }}/raw/main/.github/SBUILD/latest.yaml" #Must always be a raw URL
+      ghcr-url: "ghcr.io/${{ github.repository }}/stable" #Package will be pushed under this path
+      pkg-family: "ghostty" #Needed so soar can cross reference with other repos/nests
+      debug: false #If set to true, will run everything with set -x
+      logs: true #Will Attach the entire Logs + File as Workflow Artifact
+      rebuild: true #Will rebuild even if ghcr tag already exists
