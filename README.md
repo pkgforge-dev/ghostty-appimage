@@ -25,21 +25,6 @@ This repository provides build scripts to create a Universal AppImage for [Ghost
 1. Stable builds are based on upstream releases, with minor fixes and patches released as **version+1** tag(s).
 1. Daily nightly builds, based on the upstream [tip releases](https://github.com/ghostty-org/ghostty/releases/tag/tip), are built and released at **00:00 UTC every day** and are available as pre-releases in the [releases](https://github.com/pkgforge-dev/ghostty-appimage/releases/tag/tip) section.
 
-## 🧪 Experimental Builds (GLFW)
-
-> [!WARNING]
->
-> Please read the following carefully before using them
->
-> - These builds are available for both stable and daily nightly releases
-> - These builds use the experimental flag `-Dapp-runtime=glfw`
-> - They do not include bundled dependencies for Gtk and libadwaita
-> - Window decorations may not work on non-GNOME desktop environments (No CSD)
-> - Tabs and splits are not functional
-> - The terminal inspector does not work
-> - The build size is drastically reduced (around 20 MB) as 80+ dependencies are not bundled
-> - Please refer to the [**upstream warning notice**](https://github.com/ghostty-org/ghostty/blob/main/PACKAGING.md#build-options) for further info
-
 ## ⚙️ Installation
 
 <details>
@@ -138,7 +123,6 @@ Ghostty AppImage can easily be managed using graphical tools such as [AppImageLa
    > For more information please refer the [discussion](https://github.com/TheAssassin/AppImageLauncher/discussions/687) and the [comment](https://github.com/TheAssassin/AppImageLauncher/discussions/687#discussioncomment-12181060)
 
 2. **Using [Gear Lever](https://github.com/mijorus/gearlever)**
-
    - Download the latest AppImage package from the [releases](https://github.com/pkgforge-dev/ghostty-appimage/releases) section.
    - Simply drag and drop the files from your file manager into the Gear Lever application.
    - Follow the on-screen instructions to configure the setup as a one-time installation process.

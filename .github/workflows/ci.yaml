@@ -21,7 +21,7 @@ jobs:
       actions: read
       security-events: write
       contents: write
-    name: 👻 Build Ghostty (${{ matrix.arch }}) ${{ matrix.glfw == true && '(glfw)' || '' }}
+    name: 👻 Build Ghostty (${{ matrix.arch }})
     runs-on: ${{ matrix.runs-on }}
     strategy:
       matrix:
@@ -29,19 +29,9 @@ jobs:
           - arch: aarch64
             platform: linux/arm64
             runs-on: ubuntu-24.04-arm
-            glfw: false
           - arch: x86_64
             platform: linux/amd64
             runs-on: ubuntu-24.04
-            glfw: false
-          - arch: aarch64
-            platform: linux/arm64
-            runs-on: ubuntu-24.04-arm
-            glfw: true
-          - arch: x86_64
-            platform: linux/amd64
-            runs-on: ubuntu-24.04
-            glfw: true
     container:
       image: ghcr.io/pkgforge-dev/archlinux:latest
     steps:
@@ -78,13 +68,11 @@ jobs:
             echo "tip" > VERSION
           fi
           ./build.sh
-        env:
-          GLFW: ${{ matrix.glfw }}
 
       - name: Upload AppImage Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ghostty-appimage-${{ matrix.arch }}${{ matrix.glfw == true && '-glfw' || '' }}
+          name: ghostty-appimage-${{ matrix.arch }}
           retention-days: 7
           path: /tmp/ghostty-build/Ghostty*-${{ matrix.arch }}.AppImage*
 
@@ -136,14 +124,6 @@ jobs:
         with:
           name: ghostty-appimage-x86_64
 
-      - uses: actions/download-artifact@v4
-        with:
-          name: ghostty-appimage-aarch64-glfw
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: ghostty-appimage-x86_64-glfw
-
       - name: Ghostty stable
         uses: svenstaro/upload-release-action@v2
         with:
@@ -171,14 +151,6 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: ghostty-appimage-x86_64
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: ghostty-appimage-aarch64-glfw
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: ghostty-appimage-x86_64-glfw
 
       - name: Ghostty Tip ("Nightly")
         uses: softprops/action-gh-release@v2.3.2
