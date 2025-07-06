@@ -10,7 +10,7 @@ PUB_KEY="RWQlAjJC23149WL2sEpT/l0QKy7hMIFhYdQOFy0Z7z7PbneUgvlsnYcV"
 UPINFO="gh-releases-zsync|$(echo "${GITHUB_REPOSITORY}" | tr '/' '|')|latest|Ghostty-*$ARCH.AppImage.zsync"
 APPDATA_FILE="${PWD}/assets/ghostty.appdata.xml"
 DESKTOP_FILE="${PWD}/assets/ghostty.desktop"
-LIBS2BUNDLE="./bin/ghostty /usr/lib/libEGL*"
+LIBS2BUNDLE="./bin/ghostty /usr/lib/libEGL* /usr/lib/gdk-pixbuf-*/*/*/*"
 BUILD_ARGS="
 	--summary all \
 	--prefix ${APP_DIR} \
@@ -36,12 +36,6 @@ if [ "${GHOSTTY_VERSION}" = "tip" ]; then
 else
 	wget "https://release.files.ghostty.org/${GHOSTTY_VERSION}/ghostty-${GHOSTTY_VERSION}.tar.gz"
 	wget "https://release.files.ghostty.org/${GHOSTTY_VERSION}/ghostty-${GHOSTTY_VERSION}.tar.gz.minisig"
-fi
-
-if [ "${GLFW}" = true ]; then
-	BUILD_ARGS="${BUILD_ARGS} -Dapp-runtime=glfw"
-else
-	LIBS2BUNDLE="${LIBS2BUNDLE} /usr/lib/gdk-pixbuf-*/*/*/*"
 fi
 
 minisign -V -m "ghostty-${GHOSTTY_VERSION}.tar.gz" -P "${PUB_KEY}" -s "ghostty-${GHOSTTY_VERSION}.tar.gz.minisig"
@@ -81,14 +75,12 @@ xvfb-run -a -- sharun l -p -v -e -s -k ${LIBS2BUNDLE}
 
 # preload libpixbufloader /w ld-preload-open as svg icons breaks
 # either on ghostty tab bar or gnome-text-editor while config edit or both :(
-if [ "${GLFW}" = false ]; then
-	mv ./shared/lib/gdk-pixbuf-2.0 ./
-	cp -rv /opt/path-mapping.so ./shared/lib/
-	cp -rv gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader_svg.so ./shared/lib/
+mv ./shared/lib/gdk-pixbuf-2.0 ./
+cp -rv /opt/path-mapping.so ./shared/lib/
+cp -rv gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader_svg.so ./shared/lib/
 
-	echo 'path-mapping.so' >./.preload
-	echo 'PATH_MAPPING=/usr/lib/gdk-pixbuf-2.0:${SHARUN_DIR}/gdk-pixbuf-2.0' >>./.env
-fi
+echo 'path-mapping.so' >./.preload
+echo 'PATH_MAPPING=/usr/lib/gdk-pixbuf-2.0:${SHARUN_DIR}/gdk-pixbuf-2.0' >>./.env
 
 echo 'GHOSTTY_RESOURCES_DIR=${SHARUN_DIR}/share/ghostty' >>./.env
 echo 'unset ARGV0' >>./.env
@@ -103,11 +95,6 @@ if [ -z "${VERSION}" ]; then
 fi
 
 GHOSTTY_APPIMAGE="Ghostty-${VERSION}-${ARCH}.AppImage"
-
-if [ "${GLFW}" = true ]; then
-	UPINFO="gh-releases-zsync|$(echo "${GITHUB_REPOSITORY:-no-user/no-repo}" | tr '/' '|')|latest|Ghostty_*$ARCH.AppImage.zsync"
-	GHOSTTY_APPIMAGE="Ghostty_Glfw-${VERSION}-${ARCH}.AppImage"
-fi
 
 cd "${TMP_DIR}"
 
