@@ -36,7 +36,7 @@ jobs:
       image: ghcr.io/pkgforge-dev/archlinux:latest
     steps:
       - name: Checkout ghostty-appimage
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           persist-credentials: false
 
@@ -87,7 +87,7 @@ jobs:
     needs:
       - build_appimage
     steps:
-      - uses: actions/checkout@v4 # zizmor: ignore[artipacked]
+      - uses: actions/checkout@v5 # zizmor: ignore[artipacked]
 
       - name: Clean-up Old Release Assets
         run: |
