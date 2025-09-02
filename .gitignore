@@ -20,3 +20,9 @@ Sessionx.vim
 tags
 # Persistent undo
 [._]*.un~
+
+AppDir
+ghostty-*
+quick-sharun
+uruntime2appimage
+dist

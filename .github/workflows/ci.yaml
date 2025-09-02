@@ -74,7 +74,7 @@ jobs:
         with:
           name: ghostty-appimage-${{ matrix.arch }}
           retention-days: 7
-          path: /tmp/ghostty-build/Ghostty*-${{ matrix.arch }}.AppImage*
+          path: dist
 
   tag:
     name: "👻 Tip Tag"
