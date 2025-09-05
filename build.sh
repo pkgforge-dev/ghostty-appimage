@@ -12,6 +12,8 @@ export URUNTIME_PRELOAD=1
 export DEPLOY_OPENGL=1
 export EXEC_WRAPPER=1
 
+rm -rf AppDir dist ghostty-*
+
 BUILD_ARGS="
 	--summary all \
 	-Doptimize=ReleaseFast \
@@ -58,6 +60,7 @@ export DESKTOP="./ghostty-${GHOSTTY_VERSION}/zig-out/share/applications/com.mitc
 export ICON="./ghostty-${GHOSTTY_VERSION}/zig-out/share/icons/hicolor/256x256/apps/com.mitchellh.ghostty.png"
 
 ./quick-sharun ./ghostty-${GHOSTTY_VERSION}/zig-out/bin/ghostty
+cp -rf ./ghostty-${GHOSTTY_VERSION}/zig-out/share/* ./AppDir/share/
 ./uruntime2appimage
 
 mkdir -p ./dist
