@@ -60,7 +60,9 @@ export DESKTOP="./ghostty-${GHOSTTY_VERSION}/zig-out/share/applications/com.mitc
 export ICON="./ghostty-${GHOSTTY_VERSION}/zig-out/share/icons/hicolor/256x256/apps/com.mitchellh.ghostty.png"
 
 ./quick-sharun ./ghostty-${GHOSTTY_VERSION}/zig-out/bin/ghostty
-cp -rf ./ghostty-${GHOSTTY_VERSION}/zig-out/share/* ./AppDir/share/
+cp -rv ./ghostty-${GHOSTTY_VERSION}/zig-out/share/* ./AppDir/share/
+cp -rv ./scripts/ghostty-terminfo-installer ./AppDir/bin
+chmod a+x ./AppDir/bin/ghostty-terminfo-installer
 ./uruntime2appimage
 
 mkdir -p ./dist
