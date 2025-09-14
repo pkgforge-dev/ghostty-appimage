@@ -6,12 +6,6 @@ ARCH="$(uname -m)"
 GHOSTTY_VERSION="$(cat VERSION)"
 PUB_KEY="RWQlAjJC23149WL2sEpT/l0QKy7hMIFhYdQOFy0Z7z7PbneUgvlsnYcV"
 
-export ADD_HOOKS="self-updater.bg.hook"
-export UPINFO="gh-releases-zsync|$(echo "${GITHUB_REPOSITORY}" | tr '/' '|')|latest|Ghostty-*$ARCH.AppImage.zsync"
-export URUNTIME_PRELOAD=1
-export DEPLOY_OPENGL=1
-export EXEC_WRAPPER=1
-
 rm -rf AppDir dist ghostty-*
 
 BUILD_ARGS="
@@ -54,16 +48,3 @@ fi
 	cd "ghostty-${GHOSTTY_VERSION}"
 	zig build ${BUILD_ARGS}
 )
-
-export OUTNAME="Ghostty-${GHOSTTY_VERSION}-${ARCH}.AppImage"
-export DESKTOP="./ghostty-${GHOSTTY_VERSION}/zig-out/share/applications/com.mitchellh.ghostty.desktop"
-export ICON="./ghostty-${GHOSTTY_VERSION}/zig-out/share/icons/hicolor/256x256/apps/com.mitchellh.ghostty.png"
-
-./quick-sharun ./ghostty-${GHOSTTY_VERSION}/zig-out/bin/ghostty
-cp -rv ./ghostty-${GHOSTTY_VERSION}/zig-out/share/* ./AppDir/share/
-cp -rv ./scripts/ghostty-terminfo-installer ./AppDir/bin
-chmod a+x ./AppDir/bin/ghostty-terminfo-installer
-./uruntime2appimage
-
-mkdir -p ./dist
-mv -v ./*.AppImage* ./dist

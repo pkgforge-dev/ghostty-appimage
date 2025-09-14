@@ -1,6 +1,6 @@
 <h1><p align="center">
-  <img src="./assets/ghostty.png" alt="Ghostty Logo" width="128">
-  <img src="./assets/appimage.png" alt="AppImage Logo" width="128">
+  <img src="./assets/images/ghostty.png" alt="Ghostty Logo" width="128">
+  <img src="./assets/images/appimage.png" alt="AppImage Logo" width="128">
   <br>Ghostty AppImage<br>
   <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT">
   <img src="https://github.com/pkgforge-dev/ghostty-appimage/actions/workflows/ci.yaml/badge.svg" alt="Build Status">
@@ -101,8 +101,8 @@ _Note: Ensure you have the necessary permissions to run these commands. For more
 5. Close the properties window and double-click the AppImage file to run it.
 
 <p align="center">
-  <img src="./assets/1.png" alt="Step 1" width="384" style="margin-right: 10px;">
-  <img src="./assets/2.png" alt="Step 2" width="384">
+  <img src="./assets/images/1.png" alt="Step 1" width="384" style="margin-right: 10px;">
+  <img src="./assets/images/2.png" alt="Step 2" width="384">
 </p>
 
 </details>
@@ -150,10 +150,6 @@ Since AppImages are self-contained executables, there is no formal installation 
 1. Use a higher level tool that uses AppImageUpdate, like [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher), [AM](https://github.com/ivan-hc/AM) or [appimaged](https://github.com/probonopd/go-appimage/blob/master/src/appimaged/README.md) daemon, these tools also automatically handle desktop integration.
 
 </details>
-
-## 🛠️ Troubleshooting
-
-Refer [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) file
 
 ## 🤝 Contributing
 

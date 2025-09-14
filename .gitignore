@@ -23,7 +23,7 @@ tags
 
 AppDir
 ghostty-*
-!scripts/ghostty-terminfo-installer
+!**/ghostty-terminfo-installer.sh
 quick-sharun
 uruntime2appimage
 dist

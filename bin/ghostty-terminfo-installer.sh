@@ -32,7 +32,7 @@ yes | y)
 	terminfo_install=true
 	;;
 no | n)
-	terminfo_install=false
+	terminfo_install=false && exit 0
 	;;
 *)
 	echo "Invalid response" && exit 1
@@ -43,7 +43,8 @@ if [ "$terminfo_install" = true ]; then
 	for f in $terminfo_files; do
 		(
 			cd $APPDIR
-			sudo cp -rv ./$f /usr/$f
+			sudo mkdir -p "/usr/local/$(echo "$f" | rev | cut -d'/' -f2- | rev)"
+			sudo cp -rpv ./$f /usr/local/$f
 		)
 	done
 fi
