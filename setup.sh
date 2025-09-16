@@ -16,7 +16,7 @@ pacman -Syuq --needed --noconfirm --noprogressbar ${buildDeps} ${ghosttyDeps}
 
 ARCH="$(uname -m)"
 
-ZIG_VERSION="${ZIG_VERSION:-0.13.0}"
+ZIG_VERSION="${ZIG_VERSION:-0.14.0}"
 PANDOC_VERSION="$(get_latest_gh_release 'jgm/pandoc')"
 MINISIGN_VERSION="$(get_latest_gh_release 'jedisct1/minisign')"
 

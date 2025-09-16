@@ -6,7 +6,6 @@ ARCH="$(uname -m)"
 GHOSTTY_VERSION="$(cat VERSION)"
 PUB_KEY="RWQlAjJC23149WL2sEpT/l0QKy7hMIFhYdQOFy0Z7z7PbneUgvlsnYcV"
 
-export ADD_HOOKS="self-updater.bg.hook"
 export UPINFO="gh-releases-zsync|$(echo "${GITHUB_REPOSITORY}" | tr '/' '|')|latest|Ghostty-*$ARCH.AppImage.zsync"
 export URUNTIME_PRELOAD=1
 export DEPLOY_OPENGL=1
