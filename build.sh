@@ -62,6 +62,9 @@ export ICON="./ghostty-${GHOSTTY_VERSION}/zig-out/share/icons/hicolor/256x256/ap
 ./quick-sharun ./ghostty-${GHOSTTY_VERSION}/zig-out/bin/ghostty
 cp -rf ./ghostty-${GHOSTTY_VERSION}/zig-out/share/* ./AppDir/share/
 echo 'unset ARGV0' >> ./AppDir/.env
+# temp fix for https://github.com/pkgforge-dev/ghostty-appimage/issues/93
+ln -s /usr/share/glvnd/egl_vendor.d/10_nvidia.json ./AppDir/share/glvnd/egl_vendor.d/10_nvidia.json
+
 ./uruntime2appimage
 
 mkdir -p ./dist
