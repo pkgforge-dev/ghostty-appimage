@@ -61,6 +61,7 @@ export ICON="./ghostty-${GHOSTTY_VERSION}/zig-out/share/icons/hicolor/256x256/ap
 
 ./quick-sharun ./ghostty-${GHOSTTY_VERSION}/zig-out/bin/ghostty
 cp -rf ./ghostty-${GHOSTTY_VERSION}/zig-out/share/* ./AppDir/share/
+echo 'unset ARGV0' >> ./AppDir/.env
 ./uruntime2appimage
 
 mkdir -p ./dist
