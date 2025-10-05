@@ -26,13 +26,13 @@ GH_USER_CONTENT="https://raw.githubusercontent.com"
 PANDOC_BASE="${GH_BASE}/jgm/pandoc/releases/download/${PANDOC_VERSION}"
 MINISIGN_URL="${GH_BASE}/jedisct1/minisign/releases/download/${MINISIGN_VERSION}/minisign-${MINISIGN_VERSION}-linux.tar.gz"
 
-ZIG_PACKAGE_NAME="zig-linux-${ARCH}-${ZIG_VERSION}.tar.xz"
+ZIG_PACKAGE_NAME="zig-linux-${ARCH}-${ZIG_VERSION}"
 
 if [ "${ZIG_VERSION}" != "0.14.0" ]; then
-	ZIG_PACKAGE_NAME="zig-${ARCH}-linux-${ZIG_VERSION}.tar.xz"
+	ZIG_PACKAGE_NAME="zig-${ARCH}-linux-${ZIG_VERSION}"
 fi
 
-ZIG_URL="https://ziglang.org/download/${ZIG_VERSION}/${ZIG_PACKAGE_NAME}"
+ZIG_URL="https://ziglang.org/download/${ZIG_VERSION}/${ZIG_PACKAGE_NAME}.tar.xz"
 
 DEBLOATED_PKGS="${GH_USER_CONTENT}/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/get-debloated-pkgs.sh"
 SHARUN="${GH_USER_CONTENT}/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
@@ -62,7 +62,7 @@ rm -rf /opt/zig*
 unlink /usr/local/bin/zig || true
 wget "${ZIG_URL}" -O /tmp/zig-linux.tar.xz
 tar -xJf /tmp/zig-linux.tar.xz -C /opt
-ln -s "/opt/zig-linux-${ARCH}-${ZIG_VERSION}/zig" /usr/local/bin/zig
+ln -s "/opt/${ZIG_PACKAGE_NAME}/zig" /usr/local/bin/zig
 
 # minisign: https://github.com/jedisct1/minisign
 rm -rf /usr/local/bin/minisign
