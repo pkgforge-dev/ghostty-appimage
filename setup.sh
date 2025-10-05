@@ -25,7 +25,14 @@ GH_USER_CONTENT="https://raw.githubusercontent.com"
 
 PANDOC_BASE="${GH_BASE}/jgm/pandoc/releases/download/${PANDOC_VERSION}"
 MINISIGN_URL="${GH_BASE}/jedisct1/minisign/releases/download/${MINISIGN_VERSION}/minisign-${MINISIGN_VERSION}-linux.tar.gz"
-ZIG_URL="https://ziglang.org/download/${ZIG_VERSION}/zig-linux-${ARCH}-${ZIG_VERSION}.tar.xz"
+
+ZIG_PACKAGE_NAME="zig-linux-${ARCH}-${ZIG_VERSION}.tar.xz"
+
+if [ "${ZIG_VERSION}" != "0.14.0" ]; then
+	ZIG_PACKAGE_NAME="zig-${ARCH}-linux-${ZIG_VERSION}.tar.xz"
+fi
+
+ZIG_URL="https://ziglang.org/download/${ZIG_VERSION}/${ZIG_PACKAGE_NAME}"
 
 DEBLOATED_PKGS="${GH_USER_CONTENT}/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/get-debloated-pkgs.sh"
 SHARUN="${GH_USER_CONTENT}/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
