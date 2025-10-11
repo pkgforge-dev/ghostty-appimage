@@ -17,13 +17,11 @@ pacman -Syuq --needed --noconfirm --noprogressbar ${buildDeps} ${ghosttyDeps}
 ARCH="$(uname -m)"
 
 ZIG_VERSION="${ZIG_VERSION:-0.14.0}"
-PANDOC_VERSION="$(get_latest_gh_release 'jgm/pandoc')"
 MINISIGN_VERSION="$(get_latest_gh_release 'jedisct1/minisign')"
 
 GH_BASE="https://github.com"
 GH_USER_CONTENT="https://raw.githubusercontent.com"
 
-PANDOC_BASE="${GH_BASE}/jgm/pandoc/releases/download/${PANDOC_VERSION}"
 MINISIGN_URL="${GH_BASE}/jedisct1/minisign/releases/download/${MINISIGN_VERSION}/minisign-${MINISIGN_VERSION}-linux.tar.gz"
 
 ZIG_PACKAGE_NAME="zig-linux-${ARCH}-${ZIG_VERSION}"
@@ -37,19 +35,6 @@ ZIG_URL="https://ziglang.org/download/${ZIG_VERSION}/${ZIG_PACKAGE_NAME}.tar.xz"
 DEBLOATED_PKGS="${GH_USER_CONTENT}/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/get-debloated-pkgs.sh"
 SHARUN="${GH_USER_CONTENT}/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
 URUNTIME="${GH_USER_CONTENT}/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh"
-
-case "${ARCH}" in
-"x86_64")
-	PANDOC_URL="${PANDOC_BASE}/pandoc-${PANDOC_VERSION}-linux-amd64.tar.gz"
-	;;
-"aarch64")
-	PANDOC_URL="${PANDOC_BASE}/pandoc-${PANDOC_VERSION}-linux-arm64.tar.gz"
-	;;
-*)
-	echo "Unsupported ARCH: '${ARCH}'"
-	exit 1
-	;;
-esac
 
 # Install Debloated Pkgs
 wget "${DEBLOATED_PKGS}" -O /tmp/get-debloated-pkgs.sh
@@ -70,12 +55,6 @@ wget "${MINISIGN_URL}" -O /tmp/minisign-linux.tar.gz
 tar -xzf /tmp/minisign-linux.tar.gz -C /tmp
 mv /tmp/minisign-linux/"${ARCH}"/minisign /usr/local/bin
 
-# pandoc: https://github.com/jgm/pandoc
-rm -rf /usr/local/bin/pandoc*
-wget "${PANDOC_URL}" -O /tmp/pandoc-linux.tar.gz
-tar -xzf /tmp/pandoc-linux.tar.gz -C /tmp
-mv /tmp/"pandoc-${PANDOC_VERSION}"/bin/* /usr/local/bin
-
 # Sharun
 wget "${SHARUN}" -O quick-sharun
 chmod +x quick-sharun
@@ -91,5 +70,4 @@ rm -rf \
 	/tmp/appimagetool.AppImage \
 	/tmp/minisign-linux* \
 	/tmp/zig-linux.tar.xz \
-	/tmp/pandoc* \
 	/tmp/*.pkg.tar.zst

@@ -55,16 +55,20 @@ jobs:
       - name: Setup build environment
         run: |
           if [ "${{ github.event_name }}" == "schedule" ]; then
-            export ZIG_VERSION=0.15.1
+            ZIG_VERSION=0.15.1
             echo "tip" > VERSION
           else
-            export ZIG_VERSION=0.14.0
+            ZIG_VERSION=0.14.0
           fi
-          ZIG_VERSION=$ZIG_VERSION ./setup.sh
+          ZIG_VERSION=$ZIG_VERSION ./bin/setup-env.sh
 
-      - name: Build Ghostty AppImage
+      - name: Build Ghostty
         run: |
-          ./build.sh
+          ./bin/build-ghostty.sh
+
+      - name: Bundle AppImage
+        run: |
+          ./bin/bundle-appimage.sh
 
       - name: Upload AppImage Artifacts
         uses: actions/upload-artifact@v4
