@@ -6,21 +6,17 @@ ARCH="$(uname -m)"
 GHOSTTY_VERSION="$(cat VERSION)"
 PUB_KEY="RWQlAjJC23149WL2sEpT/l0QKy7hMIFhYdQOFy0Z7z7PbneUgvlsnYcV"
 
-export UPINFO="gh-releases-zsync|$(echo "${GITHUB_REPOSITORY}" | tr '/' '|')|latest|Ghostty-*$ARCH.AppImage.zsync"
-export URUNTIME_PRELOAD=1
-export DEPLOY_OPENGL=1
-export EXEC_WRAPPER=1
-
 rm -rf AppDir dist ghostty-*
 
 BUILD_ARGS="
-	--summary all \
-	-Doptimize=ReleaseFast \
 	-Dcpu=baseline \
+	-Doptimize=ReleaseFast \
 	-Dpie=true \
-	-Demit-docs \
-	-Dgtk-wayland=true \
-	-Dgtk-x11=true"
+    --system /tmp/offline-cache/p \
+    -Dgtk-wayland=true \
+    -Dgtk-x11=true \
+    -Demit-docs=false \
+    -Dstrip=true"
 
 if [ "${GHOSTTY_VERSION}" = "tip" ]; then
 	export UPINFO="gh-releases-zsync|$(echo "${GITHUB_REPOSITORY}" | tr '/' '|')|tip|Ghostty-*$ARCH.AppImage.zsync"
@@ -43,29 +39,8 @@ rm "ghostty-${GHOSTTY_VERSION}.tar.gz" \
 
 BUILD_ARGS="${BUILD_ARGS} -Dversion-string=${GHOSTTY_VERSION}"
 
-#Fetch Zig Cache
-if [ -f './nix/build-support/fetch-zig-cache.sh' ]; then
-	ZIG_GLOBAL_CACHE_DIR=/tmp/offline-cache ./nix/build-support/fetch-zig-cache.sh
-	BUILD_ARGS="${BUILD_ARGS} --system /tmp/offline-cache/p"
-fi
-
-# Build Ghostty with zig
 (
 	cd "ghostty-${GHOSTTY_VERSION}"
+	ZIG_GLOBAL_CACHE_DIR=/tmp/offline-cache ./nix/build-support/fetch-zig-cache.sh
 	zig build ${BUILD_ARGS}
 )
-
-export OUTNAME="Ghostty-${GHOSTTY_VERSION}-${ARCH}.AppImage"
-export DESKTOP="./ghostty-${GHOSTTY_VERSION}/zig-out/share/applications/com.mitchellh.ghostty.desktop"
-export ICON="./ghostty-${GHOSTTY_VERSION}/zig-out/share/icons/hicolor/256x256/apps/com.mitchellh.ghostty.png"
-
-./quick-sharun ./ghostty-${GHOSTTY_VERSION}/zig-out/bin/ghostty
-cp -rf ./ghostty-${GHOSTTY_VERSION}/zig-out/share/* ./AppDir/share/
-echo 'unset ARGV0' >>./AppDir/.env
-# temp fix for https://github.com/pkgforge-dev/ghostty-appimage/issues/93
-ln -s /usr/share/glvnd/egl_vendor.d/10_nvidia.json ./AppDir/share/glvnd/egl_vendor.d/10_nvidia.json
-
-./uruntime2appimage
-
-mkdir -p ./dist
-mv -v ./*.AppImage* ./dist
