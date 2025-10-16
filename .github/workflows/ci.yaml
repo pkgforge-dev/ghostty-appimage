@@ -55,7 +55,7 @@ jobs:
       - name: Setup build environment
         run: |
           if [ "${{ github.event_name }}" == "schedule" ]; then
-            ZIG_VERSION=0.15.1
+            ZIG_VERSION=0.15.2
             echo "tip" > VERSION
           else
             ZIG_VERSION=0.14.0
