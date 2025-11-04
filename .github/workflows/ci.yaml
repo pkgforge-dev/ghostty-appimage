@@ -77,6 +77,15 @@ jobs:
           retention-days: 7
           path: dist
 
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: ./AppDir/
+          artifact-name: ghostty-appimage-${{ matrix.arch }}.spdx.json
+        env:
+          SYFT_FILE_METADATA_CATALOGER_ENABLED: true
+          SYFT_FILE_METADATA_DIGESTS: sha1
+
   tag:
     name: "👻 Tip Tag"
     if: ${{ github.event_name == 'schedule' && github.ref_name == 'main' }}
