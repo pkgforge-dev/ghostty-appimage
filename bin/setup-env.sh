@@ -34,12 +34,11 @@ ZIG_URL="https://ziglang.org/download/${ZIG_VERSION}/${ZIG_PACKAGE_NAME}.tar.xz"
 
 DEBLOATED_PKGS="${GH_USER_CONTENT}/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/get-debloated-pkgs.sh"
 SHARUN="${GH_USER_CONTENT}/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
-URUNTIME="${GH_USER_CONTENT}/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh"
 
 # Install Debloated Pkgs
 wget "${DEBLOATED_PKGS}" -O /tmp/get-debloated-pkgs.sh
 chmod a+x /tmp/get-debloated-pkgs.sh
-sh /tmp/get-debloated-pkgs.sh --add-opengl --prefer-nano gtk4-mini libxml2-mini gdk-pixbuf2-mini
+sh /tmp/get-debloated-pkgs.sh --add-opengl --prefer-nano gtk4-mini libxml2-mini gdk-pixbuf2-mini librsvg-mini
 
 # Download & install other dependencies
 # zig: https://ziglang.org
@@ -59,15 +58,10 @@ mv /tmp/minisign-linux/"${ARCH}"/minisign /usr/local/bin
 wget "${SHARUN}" -O quick-sharun
 chmod +x quick-sharun
 
-# Sharun
-wget "${URUNTIME}" -O uruntime2appimage
-chmod +x uruntime2appimage
-
 # Cleanup
 pacman -Scc --noconfirm
 
 rm -rf \
 	/tmp/appimagetool.AppImage \
 	/tmp/minisign-linux* \
-	/tmp/zig-linux.tar.xz \
-	/tmp/*.pkg.tar.zst
+	/tmp/zig-linux.tar.xz
