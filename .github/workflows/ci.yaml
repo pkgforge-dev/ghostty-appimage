@@ -40,125 +40,133 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Cache dependencies
-        id: cache-ghostty
-        uses: actions/cache@v4
-        with:
-          path: |
-            /var/cache/pacman
-            /tmp/offline-cache
-            /root/.cache/zig
-          key: ${{ runner.os }}-${{ matrix.arch }}-ghostty-${{ hashFiles('**/VERSION') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.arch }}-ghostty-
+      - name: test
+        uses: pkgforge-dev/anylinux-setup-action@v1
+        id: setup
 
-      - name: Setup build environment
+      - name: Run Packaging Script
         run: |
-          if [ "${{ github.event_name }}" == "schedule" ]; then
-            ZIG_VERSION=0.15.2
-            echo "tip" > VERSION
-          else
-            ZIG_VERSION=0.14.0
-          fi
-          ZIG_VERSION=$ZIG_VERSION ./bin/setup-env.sh
+          /usr/local/bin/quick-sharun --help
 
-      - name: Build Ghostty
-        run: |
-          ./bin/build-ghostty.sh
-
-      - name: Bundle AppImage
-        run: |
-          ./bin/bundle-appimage.sh
-
-      - name: Upload AppImage Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ghostty-appimage-${{ matrix.arch }}
-          retention-days: 7
-          path: dist
-
-  tag:
-    name: "👻 Tip Tag"
-    if: ${{ github.event_name == 'schedule' && github.ref_name == 'main' }}
-    permissions:
-      actions: read
-      security-events: write
-      contents: write
-    runs-on: ubuntu-latest
-    needs:
-      - build_appimage
-    steps:
-      - uses: actions/checkout@v5 # zizmor: ignore[artipacked]
-
-      - name: Clean-up Old Release Assets
-        run: |
-          gh release view tip --json assets --jq '.assets[].name' | while read -r asset; do
-            if [ -n "$asset" ]; then
-              gh release delete-asset tip "${asset}" -y
-            fi
-          done
-        env:
-          GH_TOKEN: ${{ github.token }}
-
-      - name: Create 'tip' tag
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -fa tip -m "Latest Continuous Release" "${GITHUB_SHA}"
-          git push --force origin tip
-
-  release_stable:
-    name: 👻 Release Ghostty AppImage (Stable)
-    needs:
-      - build_appimage
-    permissions:
-      actions: read
-      contents: write
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'release' }}
-    steps:
-      - uses: actions/download-artifact@v6
-        with:
-          name: ghostty-appimage-aarch64
-
-      - uses: actions/download-artifact@v6
-        with:
-          name: ghostty-appimage-x86_64
-
-      - name: Ghostty stable
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: "*.AppImage*"
-          tag: ${{ github.ref }}
-          overwrite: true
-          file_glob: true
-
-  release_nightly:
-    name: 👻 Release Ghostty AppImage (Nightly)
-    if: ${{ github.event_name == 'schedule' && github.ref_name == 'main' }}
-    needs:
-      - build_appimage
-      - tag
-    permissions:
-      actions: read
-      contents: write
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v6
-        with:
-          name: ghostty-appimage-aarch64
-
-      - uses: actions/download-artifact@v6
-        with:
-          name: ghostty-appimage-x86_64
-
-      - name: Ghostty Tip ("Nightly")
-        uses: softprops/action-gh-release@v2.4.2
-        with:
-          name: '👻 Ghostty Tip ("Nightly")'
-          prerelease: true
-          tag_name: tip
-          target_commitish: ${{ github.sha }}
-          files: |
-            *.AppImage*
+  #     - name: Cache dependencies
+  #       id: cache-ghostty
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: |
+  #           /var/cache/pacman
+  #           /tmp/offline-cache
+  #           /root/.cache/zig
+  #         key: ${{ runner.os }}-${{ matrix.arch }}-ghostty-${{ hashFiles('**/VERSION') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-${{ matrix.arch }}-ghostty-
+  #
+  #     - name: Setup build environment
+  #       run: |
+  #         if [ "${{ github.event_name }}" == "schedule" ]; then
+  #           ZIG_VERSION=0.15.2
+  #           echo "tip" > VERSION
+  #         else
+  #           ZIG_VERSION=0.14.0
+  #         fi
+  #         ZIG_VERSION=$ZIG_VERSION ./bin/setup-env.sh
+  #
+  #     - name: Build Ghostty
+  #       run: |
+  #         ./bin/build-ghostty.sh
+  #
+  #     - name: Bundle AppImage
+  #       run: |
+  #         ./bin/bundle-appimage.sh
+  #
+  #     - name: Upload AppImage Artifacts
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: ghostty-appimage-${{ matrix.arch }}
+  #         retention-days: 7
+  #         path: dist
+  #
+  # tag:
+  #   name: "👻 Tip Tag"
+  #   if: ${{ github.event_name == 'schedule' && github.ref_name == 'main' }}
+  #   permissions:
+  #     actions: read
+  #     security-events: write
+  #     contents: write
+  #   runs-on: ubuntu-latest
+  #   needs:
+  #     - build_appimage
+  #   steps:
+  #     - uses: actions/checkout@v5 # zizmor: ignore[artipacked]
+  #
+  #     - name: Clean-up Old Release Assets
+  #       run: |
+  #         gh release view tip --json assets --jq '.assets[].name' | while read -r asset; do
+  #           if [ -n "$asset" ]; then
+  #             gh release delete-asset tip "${asset}" -y
+  #           fi
+  #         done
+  #       env:
+  #         GH_TOKEN: ${{ github.token }}
+  #
+  #     - name: Create 'tip' tag
+  #       run: |
+  #         git config user.name "github-actions[bot]"
+  #         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+  #         git tag -fa tip -m "Latest Continuous Release" "${GITHUB_SHA}"
+  #         git push --force origin tip
+  #
+  # release_stable:
+  #   name: 👻 Release Ghostty AppImage (Stable)
+  #   needs:
+  #     - build_appimage
+  #   permissions:
+  #     actions: read
+  #     contents: write
+  #   runs-on: ubuntu-latest
+  #   if: ${{ github.event_name == 'release' }}
+  #   steps:
+  #     - uses: actions/download-artifact@v6
+  #       with:
+  #         name: ghostty-appimage-aarch64
+  #
+  #     - uses: actions/download-artifact@v6
+  #       with:
+  #         name: ghostty-appimage-x86_64
+  #
+  #     - name: Ghostty stable
+  #       uses: svenstaro/upload-release-action@v2
+  #       with:
+  #         repo_token: ${{ secrets.GITHUB_TOKEN }}
+  #         file: "*.AppImage*"
+  #         tag: ${{ github.ref }}
+  #         overwrite: true
+  #         file_glob: true
+  #
+  # release_nightly:
+  #   name: 👻 Release Ghostty AppImage (Nightly)
+  #   if: ${{ github.event_name == 'schedule' && github.ref_name == 'main' }}
+  #   needs:
+  #     - build_appimage
+  #     - tag
+  #   permissions:
+  #     actions: read
+  #     contents: write
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/download-artifact@v6
+  #       with:
+  #         name: ghostty-appimage-aarch64
+  #
+  #     - uses: actions/download-artifact@v6
+  #       with:
+  #         name: ghostty-appimage-x86_64
+  #
+  #     - name: Ghostty Tip ("Nightly")
+  #       uses: softprops/action-gh-release@v2.4.2
+  #       with:
+  #         name: '👻 Ghostty Tip ("Nightly")'
+  #         prerelease: true
+  #         tag_name: tip
+  #         target_commitish: ${{ github.sha }}
+  #         files: |
+  #           *.AppImage*
