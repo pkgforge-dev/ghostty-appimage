@@ -34,7 +34,7 @@ Run the following commands in your terminal:
 
 ```bash
 # Download the latest AppImage package from releases
-wget https://github.com/pkgforge-dev/ghostty-appimage/releases/download/${VERSION}/Ghostty-${VERSION}-${ARCH}.AppImage
+wget https://github.com/pkgforge-dev/ghostty-appimage/releases/download/v${VERSION}/Ghostty-${VERSION}-${ARCH}.AppImage
 
 # Make the AppImage executable
 chmod +x Ghostty-${VERSION}-${ARCH}.AppImage
