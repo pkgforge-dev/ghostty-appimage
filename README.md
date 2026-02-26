@@ -110,17 +110,12 @@ _Note: Ensure you have the necessary permissions to run these commands. For more
 <details>
   <summary><b>Graphical (Automatic)</b></summary>
 
-Ghostty AppImage can easily be managed using graphical tools such as [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher) and [Gear Lever](https://github.com/mijorus/gearlever).
+Ghostty AppImage can easily be managed using graphical tools such as [AppManager](https://github.com/kem-a/AppManager) and [Gear Lever](https://github.com/mijorus/gearlever).
 
-1. **Using [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher)**
-
-   For detailed instructions, please refer to the [AppImageLauncher documentation](https://docs.appimage.org/user-guide/run-appimages.html#appimagelauncher).
-
-   > **🛈 NOTE**
-   >
-   > With the launch of AppImageLauncher **v3.0.0**, you have to use the alpha pre-releases as the stable release doesn't work with the static runtime
-   >
-   > For more information please refer the [discussion](https://github.com/TheAssassin/AppImageLauncher/discussions/687) and the [comment](https://github.com/TheAssassin/AppImageLauncher/discussions/687#discussioncomment-12181060)
+1. **Using [AppManager](https://github.com/kem-a/AppManager)**
+   - Download the latest AppImage package from the [releases](https://github.com/pkgforge-dev/ghostty-appimage/releases) section.
+   - Simply drag and drop the files from your file manager into the AppManager application.
+   - Follow the on-screen instructions to configure the setup as a one-time installation process.
 
 2. **Using [Gear Lever](https://github.com/mijorus/gearlever)**
    - Download the latest AppImage package from the [releases](https://github.com/pkgforge-dev/ghostty-appimage/releases) section.
@@ -128,6 +123,12 @@ Ghostty AppImage can easily be managed using graphical tools such as [AppImageLa
    - Follow the on-screen instructions to configure the setup as a one-time installation process.
 
 _Note: Ensure the necessary prerequsites are satisfied for these applications. For more detailed usage, refer to the documentation of each tool_
+
+> **🛈 NOTE**
+  Gearlever does not support delta updates with zsync and you may need to give it the URL to update manually.
+
+> **🛈 NOTE**
+  Gearlever does not have official AppImage releases. You can use [this one](https://github.com/pkgforge-dev/Gear-Lever-AppImage) however.
 
    </details>
 
