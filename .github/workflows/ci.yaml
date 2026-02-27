@@ -71,7 +71,7 @@ jobs:
           ./bin/bundle-appimage.sh
 
       - name: Upload AppImage Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ghostty-appimage-${{ matrix.arch }}
           retention-days: 7
