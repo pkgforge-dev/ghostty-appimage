@@ -122,7 +122,8 @@ Ghostty AppImage can easily be managed using graphical tools such as [AppManager
    - Simply drag and drop the files from your file manager into the Gear Lever application.
    - Follow the on-screen instructions to configure the setup as a one-time installation process.
 
-_Note: Ensure the necessary prerequsites are satisfied for these applications. For more detailed usage, refer to the documentation of each tool_
+> **🛈 NOTE**
+> Ensure the necessary prerequsites are satisfied for these applications. For more detailed usage, refer to the documentation of each tool
 
 > **🛈 NOTE**
   Gearlever does not support delta updates with zsync and you may need to give it the URL to update manually.
