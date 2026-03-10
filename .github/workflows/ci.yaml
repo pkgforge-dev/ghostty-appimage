@@ -54,13 +54,7 @@ jobs:
 
       - name: Setup build environment
         run: |
-          if [ "${{ github.event_name }}" == "schedule" ]; then
-            ZIG_VERSION=0.15.2
-            echo "tip" > VERSION
-          else
-            ZIG_VERSION=0.14.0
-          fi
-          ZIG_VERSION=$ZIG_VERSION ./bin/setup-env.sh
+          ./bin/setup-env.sh
 
       - name: Build Ghostty
         run: |

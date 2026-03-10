@@ -16,21 +16,12 @@ pacman -Syuq --needed --noconfirm --noprogressbar ${buildDeps} ${ghosttyDeps}
 
 ARCH="$(uname -m)"
 
-ZIG_VERSION="${ZIG_VERSION:-0.14.0}"
 MINISIGN_VERSION="$(get_latest_gh_release 'jedisct1/minisign')"
 
 GH_BASE="https://github.com"
 GH_USER_CONTENT="https://raw.githubusercontent.com"
 
 MINISIGN_URL="${GH_BASE}/jedisct1/minisign/releases/download/${MINISIGN_VERSION}/minisign-${MINISIGN_VERSION}-linux.tar.gz"
-
-ZIG_PACKAGE_NAME="zig-linux-${ARCH}-${ZIG_VERSION}"
-
-if [ "${ZIG_VERSION}" != "0.14.0" ]; then
-	ZIG_PACKAGE_NAME="zig-${ARCH}-linux-${ZIG_VERSION}"
-fi
-
-ZIG_URL="https://ziglang.org/download/${ZIG_VERSION}/${ZIG_PACKAGE_NAME}.tar.xz"
 
 DEBLOATED_PKGS="${GH_USER_CONTENT}/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/get-debloated-pkgs.sh"
 SHARUN="${GH_USER_CONTENT}/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
@@ -39,14 +30,6 @@ SHARUN="${GH_USER_CONTENT}/pkgforge-dev/Anylinux-AppImages/refs/heads/main/usefu
 wget "${DEBLOATED_PKGS}" -O /tmp/get-debloated-pkgs.sh
 chmod a+x /tmp/get-debloated-pkgs.sh
 sh /tmp/get-debloated-pkgs.sh --add-opengl --prefer-nano gtk4-mini libxml2-mini gdk-pixbuf2-mini librsvg-mini
-
-# Download & install other dependencies
-# zig: https://ziglang.org
-rm -rf /opt/zig*
-unlink /usr/local/bin/zig || true
-wget "${ZIG_URL}" -O /tmp/zig-linux.tar.xz
-tar -xJf /tmp/zig-linux.tar.xz -C /opt
-ln -s "/opt/${ZIG_PACKAGE_NAME}/zig" /usr/local/bin/zig
 
 # minisign: https://github.com/jedisct1/minisign
 rm -rf /usr/local/bin/minisign
