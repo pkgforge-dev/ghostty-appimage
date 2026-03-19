@@ -54,6 +54,9 @@ jobs:
 
       - name: Setup build environment
         run: |
+          if [ "${{ github.event_name }}" == "schedule" ]; then
+            echo "tip" > VERSION
+          fi
           ./bin/setup-env.sh
 
       - name: Build Ghostty
