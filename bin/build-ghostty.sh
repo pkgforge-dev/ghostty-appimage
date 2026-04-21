@@ -33,7 +33,16 @@ fi
 
 minisign -V -m "ghostty-${GHOSTTY_VERSION}.tar.gz" -P "${PUB_KEY}" -s "ghostty-${GHOSTTY_VERSION}.tar.gz.minisig"
 
+# Capture the top-level directory name embedded in the tarball before extracting,
+# as it may include a commit hash suffix (e.g. ghostty-1.3.2-main-+58af471) that
+# differs from the semantic version used as GHOSTTY_VERSION.
+GHOSTTY_EXTRACT_DIR="$(tar -tf "ghostty-${GHOSTTY_VERSION}.tar.gz" | head -1 | cut -d/ -f1)"
+
 tar -xzmf "ghostty-${GHOSTTY_VERSION}.tar.gz"
+
+# Rename the extracted directory to match ghostty-${GHOSTTY_VERSION} if the tarball
+# embedded a different name (e.g. with a commit hash appended).
+[ "${GHOSTTY_EXTRACT_DIR}" != "ghostty-${GHOSTTY_VERSION}" ] && mv "${GHOSTTY_EXTRACT_DIR}" "ghostty-${GHOSTTY_VERSION}"
 
 rm "ghostty-${GHOSTTY_VERSION}.tar.gz" \
 	"ghostty-${GHOSTTY_VERSION}.tar.gz.minisig"
