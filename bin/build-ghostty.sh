@@ -42,10 +42,10 @@ BUILD_ARGS="${BUILD_ARGS} -Dversion-string=${GHOSTTY_VERSION}"
 
 # Configure Zig: https://ziglang.org
 ZIG_VERSION="$(cat "ghostty-${GHOSTTY_VERSION}/build.zig.zon" | grep ".minimum_zig_version" | cut -d'"' -f2)"
+ZIG_PACKAGE_NAME="zig-${ARCH}-linux-${ZIG_VERSION}"
 CURRENT_ZIG_VERSION=$(zig version 2>/dev/null || true)
 if [ "$CURRENT_ZIG_VERSION" != "$ZIG_VERSION" ]; then
 	echo "Installing Zig ${ZIG_VERSION}..."
-	ZIG_PACKAGE_NAME="zig-${ARCH}-linux-${ZIG_VERSION}"
 	ZIG_URL="https://ziglang.org/download/${ZIG_VERSION}/${ZIG_PACKAGE_NAME}.tar.xz"
 	rm -rf /opt/zig*
 	unlink /usr/local/bin/zig || true
