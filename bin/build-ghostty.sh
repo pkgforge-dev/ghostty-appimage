@@ -13,6 +13,9 @@ BUILD_ARGS="
 	-Doptimize=ReleaseFast \
 	-Dpie=true \
     --system /tmp/offline-cache/p \
+    -fno-sys=freetype \
+    -fno-sys=zlib \
+    -fno-sys=libpng \
     -Dgtk-wayland=true \
     -Dgtk-x11=true \
     -Demit-docs=false \
