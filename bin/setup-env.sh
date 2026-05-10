@@ -37,7 +37,7 @@ SHARUN="${GH_USER_CONTENT}/pkgforge-dev/Anylinux-AppImages/refs/heads/main/usefu
 # Install Debloated Pkgs
 wget "${DEBLOATED_PKGS}" -O /tmp/get-debloated-pkgs.sh
 chmod a+x /tmp/get-debloated-pkgs.sh
-sh /tmp/get-debloated-pkgs.sh --add-opengl --prefer-nano gtk4-mini libxml2-mini gdk-pixbuf2-mini librsvg-mini
+sh /tmp/get-debloated-pkgs.sh --add-common --prefer-nano
 
 # minisign: https://github.com/jedisct1/minisign
 rm -rf /usr/local/bin/minisign
