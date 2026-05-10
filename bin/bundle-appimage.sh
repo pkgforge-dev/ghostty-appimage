@@ -6,7 +6,6 @@ ARCH="$(uname -m)"
 GHOSTTY_VERSION="$(cat VERSION)"
 
 export UPINFO="gh-releases-zsync|$(echo "${GITHUB_REPOSITORY}" | tr '/' '|')|latest|Ghostty-*$ARCH.AppImage.zsync"
-export URUNTIME_PRELOAD=1
 export DEPLOY_OPENGL=1
 export EXEC_WRAPPER=1
 export OUTNAME="Ghostty-${GHOSTTY_VERSION}-${ARCH}.AppImage"

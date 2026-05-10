@@ -14,6 +14,14 @@ ghosttyDeps="gtk4 libadwaita gtk4-layer-shell"
 rm -rf "/usr/share/libalpm/hooks/package-cleanup.hook"
 pacman -Syuq --needed --noconfirm --noprogressbar ${buildDeps} ${ghosttyDeps}
 
+# GCC 15+ compiles glibc crt startup objects with .sframe sections that use R_X86_64_PC64
+# relocations. Zig's self-hosted linker doesn't support this relocation type, causing
+# build-time helpers (e.g. ghostty-build-data) to fail. Strip .sframe and its associated
+# relocation section from the affected objects so the linker never encounters them.
+for _crt in /usr/lib/crt1.o /usr/lib/Scrt1.o /usr/lib/rcrt1.o; do
+	[ -f "$_crt" ] && objcopy --remove-section .sframe --remove-section .rela.sframe "$_crt"
+done
+
 ARCH="$(uname -m)"
 
 MINISIGN_VERSION="$(get_latest_gh_release 'jedisct1/minisign')"
@@ -29,7 +37,7 @@ SHARUN="${GH_USER_CONTENT}/pkgforge-dev/Anylinux-AppImages/refs/heads/main/usefu
 # Install Debloated Pkgs
 wget "${DEBLOATED_PKGS}" -O /tmp/get-debloated-pkgs.sh
 chmod a+x /tmp/get-debloated-pkgs.sh
-sh /tmp/get-debloated-pkgs.sh --add-opengl --prefer-nano gtk4-mini libxml2-mini gdk-pixbuf2-mini librsvg-mini
+sh /tmp/get-debloated-pkgs.sh --add-common --prefer-nano
 
 # minisign: https://github.com/jedisct1/minisign
 rm -rf /usr/local/bin/minisign
