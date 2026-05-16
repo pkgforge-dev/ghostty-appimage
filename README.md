@@ -153,6 +153,10 @@ Since AppImages are self-contained executables, there is no formal installation 
 
 </details>
 
+## 🛠️ Troubleshooting
+
+See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for known issues and fixes.
+
 ## 🤝 Contributing
 
 Contributions & Bugfixes are welcome. If you like to contribute, please feel free to fork the repository and submit a pull request.
