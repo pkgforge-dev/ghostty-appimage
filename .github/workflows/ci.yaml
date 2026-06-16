@@ -40,6 +40,9 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Preparing Container
+        uses: pkgforge-dev/anylinux-setup-action@0964f2258d6c93d1391359978dde081fd8b3c6af # v2
+
       - name: Cache dependencies
         id: cache-ghostty
         uses: actions/cache@v4
