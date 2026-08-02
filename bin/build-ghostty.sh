@@ -12,7 +12,6 @@ BUILD_ARGS="
 	-Dcpu=baseline \
 	-Doptimize=ReleaseFast \
 	-Dpie=true \
-    --system /tmp/offline-cache/p \
     -fno-sys=freetype \
     -fno-sys=zlib \
     -fno-sys=libpng \
@@ -46,6 +45,15 @@ BUILD_ARGS="${BUILD_ARGS} -Dversion-string=${GHOSTTY_VERSION}"
 # Configure Zig: https://ziglang.org
 ZIG_VERSION="$(cat "ghostty-${GHOSTTY_VERSION}/build.zig.zon" | grep ".minimum_zig_version" | cut -d'"' -f2)"
 ZIG_PACKAGE_NAME="zig-${ARCH}-linux-${ZIG_VERSION}"
+
+# Determine offline cache flags based on Zig version (0.16.0 changed caching structure)
+ZIG_MAJOR="$(echo "${ZIG_VERSION}" | cut -d. -f1)"
+ZIG_MINOR="$(echo "${ZIG_VERSION}" | cut -d. -f2)"
+if [ "${ZIG_MAJOR}" -gt 0 ] || [ "${ZIG_MINOR}" -ge 16 ]; then
+	BUILD_ARGS="${BUILD_ARGS} --global-cache-dir /tmp/offline-cache"
+else
+	BUILD_ARGS="${BUILD_ARGS} --system /tmp/offline-cache/p"
+fi
 CURRENT_ZIG_VERSION=$(zig version 2>/dev/null || true)
 if [ "$CURRENT_ZIG_VERSION" != "$ZIG_VERSION" ]; then
 	echo "Installing Zig ${ZIG_VERSION}..."
