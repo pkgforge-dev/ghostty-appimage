@@ -83,6 +83,9 @@ jobs:
         run: |
           ./bin/bundle-appimage.sh
 
+      - name: Validate AppImage
+        run: ./bin/repo-management.sh validate-appimage
+
       - name: Upload AppImage Artifacts
         uses: actions/upload-artifact@v4
         with:
