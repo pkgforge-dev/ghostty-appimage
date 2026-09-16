@@ -31,7 +31,19 @@ GH_BASE="https://github.com"
 MINISIGN_URL="${GH_BASE}/jedisct1/minisign/releases/download/${MINISIGN_VERSION}/minisign-${MINISIGN_VERSION}-linux.tar.gz"
 
 # Install Debloated Pkgs (get-debloated-pkgs provided by anylinux-setup-action)
+if ! command -v get-debloated-pkgs >/dev/null 2>&1; then
+	echo "get-debloated-pkgs not found, installing..."
+	wget "https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/get-debloated-pkgs.sh" -O /usr/local/bin/get-debloated-pkgs
+	chmod +x /usr/local/bin/get-debloated-pkgs
+fi
 get-debloated-pkgs --add-common --prefer-nano
+
+# quick-sharun (also provided by anylinux-setup-action)
+if ! command -v quick-sharun >/dev/null 2>&1; then
+	echo "quick-sharun not found, installing..."
+	wget "https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh" -O /usr/local/bin/quick-sharun
+	chmod +x /usr/local/bin/quick-sharun
+fi
 
 # minisign: https://github.com/jedisct1/minisign
 rm -rf /usr/local/bin/minisign
