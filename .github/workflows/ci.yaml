@@ -162,3 +162,77 @@ jobs:
           target_commitish: ${{ github.sha }}
           files: |
             *.AppImage*
+
+  create_release_pr:
+    name: "👻 Upstream Stable Release"
+    if: ${{ github.event_name == 'schedule' && github.ref_name == 'main' }}
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7 # zizmor: ignore[artipacked]
+        with:
+          fetch-depth: 0
+
+      - name: Detect upstream stable release
+        id: detect
+        run: |
+          set -eu
+          if version="$(./bin/check-upstream-release.sh)"; then
+            echo "New upstream stable release: ${version}"
+            echo "release=true" >> "${GITHUB_OUTPUT}"
+            echo "version=${version}" >> "${GITHUB_OUTPUT}"
+          else
+            echo "No new upstream stable release"
+            echo "release=false" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Push release branch and tag
+        if: ${{ steps.detect.outputs.release == 'true' }}
+        env:
+          VERSION: ${{ steps.detect.outputs.version }}
+        run: |
+          set -eux
+          branch="release/${VERSION}"
+          tag="v${VERSION}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git ls-remote --exit-code --heads origin "${branch}" >/dev/null 2>&1; then
+            git checkout -B "${branch}" "origin/${branch}"
+          else
+            git checkout -b "${branch}"
+            printf '%s\n' "${VERSION}" > VERSION
+            git add VERSION
+            git commit -m "chore(release): set VERSION to ${VERSION}"
+            git push origin "${branch}"
+          fi
+
+          if ! git ls-remote --exit-code --tags origin "refs/tags/${tag}" >/dev/null 2>&1; then
+            git tag -a "${tag}" -m "Ghostty ${VERSION}"
+            git push origin "${tag}"
+          fi
+
+      - name: Open release pull request
+        if: ${{ steps.detect.outputs.release == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.detect.outputs.version }}
+        run: |
+          set -eux
+          branch="release/${VERSION}"
+          if [ -n "$(gh pr list --head "${branch}" --state open --json number --jq '.[0].number')" ]; then
+            echo "Open pull request for ${branch} already exists"
+            exit 0
+          fi
+          gh pr create \
+            --base main \
+            --head "${branch}" \
+            --title "👻 Release Ghostty ${VERSION}" \
+            --body "Automated release PR for upstream Ghostty \`${VERSION}\`.
+
+          - Updates \`VERSION\` to \`${VERSION}\`
+          - Adds tag \`v${VERSION}\`
+
+          Upstream tag: https://github.com/ghostty-org/ghostty/releases/tag/v${VERSION}"
