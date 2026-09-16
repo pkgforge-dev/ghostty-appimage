@@ -186,6 +186,51 @@ cmd_tag_tip() {
 	git push --force origin tip
 }
 
+cmd_validate_appimage() {
+	version="$(cat VERSION)"
+	if printf '%s' "${version}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+		tag="latest"
+	else
+		tag="tip"
+	fi
+
+	arch="$(uname -m)"
+	repo="${GITHUB_REPOSITORY:-pkgforge-dev/ghostty-appimage}"
+	expected="gh-releases-zsync|$(printf '%s' "${repo}" | tr '/' '|')|${tag}|Ghostty-*${arch}.AppImage.zsync"
+
+	validated=0
+	for appimage in ./dist/Ghostty-*-"${arch}".AppImage; do
+		[ -e "${appimage}" ] || continue
+		validated=1
+
+		actual="$("${appimage}" --appimage-updateinfo)"
+		if [ "${actual}" != "${expected}" ]; then
+			log "UPINFO mismatch for ${appimage}"
+			log "  expected: ${expected}"
+			log "  actual:   ${actual}"
+			exit 1
+		fi
+		log "UPINFO OK  ${actual}"
+
+		zsync="${appimage}.zsync"
+		[ -e "${zsync}" ] || continue
+		want_sha="$(grep -a '^SHA-1:' "${zsync}" | awk '{print $2}')"
+		got_sha="$(sha1sum "${appimage}" | awk '{print $1}')"
+		if [ "${want_sha}" != "${got_sha}" ]; then
+			log "SHA-1 mismatch for ${appimage}"
+			log "  zsync: ${want_sha}"
+			log "  sha1:  ${got_sha}"
+			exit 1
+		fi
+		log "SHA-1 OK   ${got_sha}"
+	done
+
+	if [ "${validated}" -eq 0 ]; then
+		log "No AppImage found for ${arch} in $(pwd)/dist"
+		exit 1
+	fi
+}
+
 command="${1:-}"
 if [ "$#" -gt 0 ]; then
 	shift
@@ -194,6 +239,7 @@ fi
 case "${command}" in
 tip-version) cmd_tip_version "$@" ;;
 lint) cmd_lint "$@" ;;
+validate-appimage) cmd_validate_appimage "$@" ;;
 detect) detect_release "$@" ;;
 validate-tag) validate_tag "$@" ;;
 resolve-tag) cmd_resolve_tag "$@" ;;
@@ -202,7 +248,7 @@ publish) cmd_publish "$@" ;;
 publish-tip) cmd_publish_tip "$@" ;;
 tag-tip) cmd_tag_tip "$@" ;;
 *)
-	log "Usage: $0 <tip-version|lint|detect|validate-tag|resolve-tag|open-pr|publish|publish-tip|tag-tip> [args]"
+	log "Usage: $0 <tip-version|lint|validate-appimage|detect|validate-tag|resolve-tag|open-pr|publish|publish-tip|tag-tip> [args]"
 	exit 1
 	;;
 esac
