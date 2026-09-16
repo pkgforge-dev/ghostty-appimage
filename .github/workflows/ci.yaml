@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Release tag to publish (defaults to v<VERSION>), e.g. v1.3.1+1"
+        description: "Release tag: <major>.<minor>.<patch> or <major>.<minor>.<patch>+<n>, optional 'v' prefix (defaults to v<VERSION>)"
         required: false
         type: string
       publish:
@@ -156,6 +156,17 @@ jobs:
               exit 0
             fi
           fi
+
+          case "${tag}" in
+          v*) ;;
+          *) tag="v${tag}" ;;
+          esac
+
+          if ! printf '%s\n' "${tag}" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+(\+[0-9]+)?$'; then
+            echo "Invalid release tag '${tag}': expected <major>.<minor>.<patch> or <major>.<minor>.<patch>+<n> (optional 'v' prefix)" >&2
+            exit 1
+          fi
+
           version="${tag#v}"
           echo "Publishing release ${tag} (version ${version})"
           echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
