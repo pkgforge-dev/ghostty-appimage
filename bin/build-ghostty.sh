@@ -4,7 +4,6 @@ set -eux
 
 ARCH="$(uname -m)"
 GHOSTTY_VERSION="$(cat VERSION)"
-GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-pkgforge-dev/ghostty-appimage}"
 PUB_KEY="RWQlAjJC23149WL2sEpT/l0QKy7hMIFhYdQOFy0Z7z7PbneUgvlsnYcV"
 
 rm -rf AppDir dist ghostty-*
@@ -22,8 +21,6 @@ BUILD_ARGS="
     -Dstrip=true"
 
 if [ "${GHOSTTY_VERSION}" = "tip" ]; then
-	UPINFO="gh-releases-zsync|$(echo "${GITHUB_REPOSITORY}" | tr '/' '|')|tip|Ghostty-*$ARCH.AppImage.zsync"
-	export UPINFO
 	wget "https://github.com/ghostty-org/ghostty/releases/download/tip/ghostty-source.tar.gz" -O "ghostty-${GHOSTTY_VERSION}.tar.gz"
 	wget "https://github.com/ghostty-org/ghostty/releases/download/tip/ghostty-source.tar.gz.minisig" -O "ghostty-${GHOSTTY_VERSION}.tar.gz.minisig"
 	GHOSTTY_VERSION="$(tar -tf "ghostty-${GHOSTTY_VERSION}.tar.gz" --wildcards "*zig.zon.txt" | awk '-F[-/]' '{print $2"-"$3"-"$4}')"
