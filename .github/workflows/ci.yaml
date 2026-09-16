@@ -7,6 +7,9 @@ on:
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths: ["VERSION"]
   pull_request:
     paths-ignore:
       - "**/*.md"
@@ -133,6 +136,52 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
           file_glob: true
+
+  publish_release:
+    name: 👻 Publish Ghostty AppImage (Release)
+    if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
+    needs:
+      - build_appimage
+    permissions:
+      actions: read
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7 # zizmor: ignore[artipacked]
+
+      - name: Resolve release tag
+        id: release
+        run: |
+          set -eu
+          version="$(cat VERSION)"
+          tag="v${version}"
+          if git ls-remote --exit-code --tags origin "refs/tags/${tag}" >/dev/null 2>&1; then
+            echo "Found tag ${tag}, publishing release"
+            echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
+            echo "version=${version}" >> "${GITHUB_OUTPUT}"
+          else
+            echo "No tag ${tag} for VERSION ${version}, nothing to release"
+          fi
+
+      - uses: actions/download-artifact@v6
+        if: steps.release.outputs.tag != ''
+        with:
+          name: ghostty-appimage-aarch64
+
+      - uses: actions/download-artifact@v6
+        if: steps.release.outputs.tag != ''
+        with:
+          name: ghostty-appimage-x86_64
+
+      - name: Publish release
+        if: steps.release.outputs.tag != ''
+        uses: softprops/action-gh-release@v3.0.2
+        with:
+          tag_name: ${{ steps.release.outputs.tag }}
+          name: Ghostty ${{ steps.release.outputs.version }}
+          generate_release_notes: true
+          files: |
+            *.AppImage*
 
   release_nightly:
     name: 👻 Release Ghostty AppImage (Nightly)
