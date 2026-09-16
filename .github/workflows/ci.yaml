@@ -15,8 +15,6 @@ on:
       - "**/*.md"
       - "**/VERSION"
     types: [opened, synchronize, reopened]
-  release:
-    types: [published]
 
 jobs:
   build_appimage:
@@ -112,33 +110,6 @@ jobs:
 
   release_stable:
     name: 👻 Release Ghostty AppImage (Stable)
-    needs:
-      - build_appimage
-    permissions:
-      actions: read
-      contents: write
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'release' }}
-    steps:
-      - uses: actions/download-artifact@v6
-        with:
-          name: ghostty-appimage-aarch64
-
-      - uses: actions/download-artifact@v6
-        with:
-          name: ghostty-appimage-x86_64
-
-      - name: Ghostty stable
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: "*.AppImage*"
-          tag: ${{ github.ref }}
-          overwrite: true
-          file_glob: true
-
-  publish_release:
-    name: 👻 Publish Ghostty AppImage (Release)
     if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
     needs:
       - build_appimage
