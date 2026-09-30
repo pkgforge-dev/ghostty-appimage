@@ -4,8 +4,16 @@ set -eux
 
 ARCH="$(uname -m)"
 GHOSTTY_VERSION="$(cat VERSION)"
+GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-pkgforge-dev/ghostty-appimage}"
 
-export UPINFO="gh-releases-zsync|$(echo "${GITHUB_REPOSITORY}" | tr '/' '|')|latest|Ghostty-*$ARCH.AppImage.zsync"
+if printf '%s' "${GHOSTTY_VERSION}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+	UPINFO_TAG="latest"
+else
+	UPINFO_TAG="tip"
+fi
+
+UPINFO="gh-releases-zsync|$(echo "${GITHUB_REPOSITORY}" | tr '/' '|')|${UPINFO_TAG}|Ghostty-*$ARCH.AppImage.zsync"
+export UPINFO
 export DEPLOY_OPENGL=1
 export EXEC_WRAPPER=1
 export URUNTIME_PRELOAD=1

@@ -6,7 +6,20 @@ concurrency:
 on:
   schedule:
     - cron: "0 0 * * *"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag: <major>.<minor>.<patch> or <major>.<minor>.<patch>+<n>, optional 'v' prefix (defaults to v<VERSION>)"
+        required: false
+        type: string
+      publish:
+        description: "Publish the GitHub release for the resolved tag"
+        required: false
+        default: false
+        type: boolean
+  push:
+    branches: [main]
+    paths: ["VERSION"]
   pull_request:
     paths-ignore:
       - "**/*.md"
@@ -55,12 +68,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ matrix.arch }}-ghostty-
 
+      - name: Use tip version
+        if: ${{ github.event_name == 'schedule' }}
+        run: ./bin/repo-management.sh tip-version
+
       - name: Setup build environment
-        run: |
-          if [ "${{ github.event_name }}" == "schedule" ]; then
-            echo "tip" > VERSION
-          fi
-          ./bin/setup-env.sh
+        run: ./bin/setup-env.sh
 
       - name: Build Ghostty
         run: |
@@ -69,6 +82,9 @@ jobs:
       - name: Bundle AppImage
         run: |
           ./bin/bundle-appimage.sh
+
+      - name: Validate AppImage
+        run: ./bin/repo-management.sh validate-appimage
 
       - name: Upload AppImage Artifacts
         uses: actions/upload-artifact@v4
@@ -90,49 +106,59 @@ jobs:
     steps:
       - uses: actions/checkout@v7 # zizmor: ignore[artipacked]
 
-      - name: Clean-up Old Release Assets
-        run: |
-          gh release view tip --json assets --jq '.assets[].name' | while read -r asset; do
-            if [ -n "$asset" ]; then
-              gh release delete-asset tip "${asset}" -y
-            fi
-          done
+      - name: Update 'tip' release
         env:
           GH_TOKEN: ${{ github.token }}
-
-      - name: Create 'tip' tag
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -fa tip -m "Latest Continuous Release" "${GITHUB_SHA}"
-          git push --force origin tip
+        run: ./bin/repo-management.sh tag-tip
 
   release_stable:
     name: 👻 Release Ghostty AppImage (Stable)
+    if: >-
+      ${{
+        (github.event_name == 'push' && github.ref_name == 'main')
+        || github.event_name == 'release'
+        || (github.event_name == 'workflow_dispatch' && inputs.publish)
+      }}
     needs:
       - build_appimage
     permissions:
       actions: read
       contents: write
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'release' }}
     steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Resolve release tag
+        id: release
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          set -eu
+          tag="$(./bin/repo-management.sh resolve-tag)"
+          if [ -n "${tag}" ]; then
+            echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
+          fi
+
       - uses: actions/download-artifact@v6
+        if: steps.release.outputs.tag != ''
         with:
           name: ghostty-appimage-aarch64
 
       - uses: actions/download-artifact@v6
+        if: steps.release.outputs.tag != ''
         with:
           name: ghostty-appimage-x86_64
 
-      - name: Ghostty stable
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: "*.AppImage*"
-          tag: ${{ github.ref }}
-          overwrite: true
-          file_glob: true
+      - name: Publish release
+        if: steps.release.outputs.tag != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+        run: ./bin/repo-management.sh publish "${TAG}"
 
   release_nightly:
     name: 👻 Release Ghostty AppImage (Nightly)
@@ -154,14 +180,9 @@ jobs:
           name: ghostty-appimage-x86_64
 
       - name: Ghostty Tip ("Nightly")
-        uses: softprops/action-gh-release@v3.0.3
-        with:
-          name: '👻 Ghostty Tip ("Nightly")'
-          prerelease: true
-          tag_name: tip
-          target_commitish: ${{ github.sha }}
-          files: |
-            *.AppImage*
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./bin/repo-management.sh publish-tip
 
   create_release_pr:
     name: "👻 Upstream Stable Release"
@@ -179,7 +200,7 @@ jobs:
         id: detect
         run: |
           set -eu
-          if version="$(./bin/check-upstream-release.sh)"; then
+          if version="$(./bin/repo-management.sh detect)"; then
             echo "New upstream stable release: ${version}"
             echo "release=true" >> "${GITHUB_OUTPUT}"
             echo "version=${version}" >> "${GITHUB_OUTPUT}"
@@ -188,51 +209,39 @@ jobs:
             echo "release=false" >> "${GITHUB_OUTPUT}"
           fi
 
-      - name: Push release branch and tag
-        if: ${{ steps.detect.outputs.release == 'true' }}
-        env:
-          VERSION: ${{ steps.detect.outputs.version }}
-        run: |
-          set -eux
-          branch="release/${VERSION}"
-          tag="v${VERSION}"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          if git ls-remote --exit-code --heads origin "${branch}" >/dev/null 2>&1; then
-            git checkout -B "${branch}" "origin/${branch}"
-          else
-            git checkout -b "${branch}"
-            printf '%s\n' "${VERSION}" > VERSION
-            git add VERSION
-            git commit -m "chore(release): set VERSION to ${VERSION}"
-            git push origin "${branch}"
-          fi
-
-          if ! git ls-remote --exit-code --tags origin "refs/tags/${tag}" >/dev/null 2>&1; then
-            git tag -a "${tag}" -m "Ghostty ${VERSION}"
-            git push origin "${tag}"
-          fi
-
       - name: Open release pull request
         if: ${{ steps.detect.outputs.release == 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.detect.outputs.version }}
-        run: |
-          set -eux
-          branch="release/${VERSION}"
-          if [ -n "$(gh pr list --head "${branch}" --state open --json number --jq '.[0].number')" ]; then
-            echo "Open pull request for ${branch} already exists"
-            exit 0
-          fi
-          gh pr create \
-            --base main \
-            --head "${branch}" \
-            --title "👻 Release Ghostty ${VERSION}" \
-            --body "Automated release PR for upstream Ghostty \`${VERSION}\`.
+        run: ./bin/repo-management.sh open-pr "${VERSION}"
 
-          - Updates \`VERSION\` to \`${VERSION}\`
-          - Adds tag \`v${VERSION}\`
+  lint:
+    name: 🧹 pre-commit
+    if: ${{ github.event_name == 'pull_request' }}
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
-          Upstream tag: https://github.com/ghostty-org/ghostty/releases/tag/v${VERSION}"
+      - uses: actions/setup-python@v5
+        id: python
+        with:
+          python-version: "3.x"
+
+      - name: Cache pre-commit environments
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: |
+            pre-commit-${{ runner.os }}-${{ steps.python.outputs.python-version }}-
+
+      - name: Install pre-commit
+        run: pip install pre-commit
+
+      - name: Run pre-commit
+        run: ./bin/repo-management.sh lint

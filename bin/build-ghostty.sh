@@ -21,7 +21,6 @@ BUILD_ARGS="
     -Dstrip=true"
 
 if [ "${GHOSTTY_VERSION}" = "tip" ]; then
-	export UPINFO="gh-releases-zsync|$(echo "${GITHUB_REPOSITORY}" | tr '/' '|')|tip|Ghostty-*$ARCH.AppImage.zsync"
 	wget "https://github.com/ghostty-org/ghostty/releases/download/tip/ghostty-source.tar.gz" -O "ghostty-${GHOSTTY_VERSION}.tar.gz"
 	wget "https://github.com/ghostty-org/ghostty/releases/download/tip/ghostty-source.tar.gz.minisig" -O "ghostty-${GHOSTTY_VERSION}.tar.gz.minisig"
 	GHOSTTY_VERSION="$(tar -xOf "ghostty-${GHOSTTY_VERSION}.tar.gz" --wildcards --no-wildcards-match-slash "*/VERSION" | head -n1)"
