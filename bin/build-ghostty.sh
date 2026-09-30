@@ -24,7 +24,11 @@ if [ "${GHOSTTY_VERSION}" = "tip" ]; then
 	export UPINFO="gh-releases-zsync|$(echo "${GITHUB_REPOSITORY}" | tr '/' '|')|tip|Ghostty-*$ARCH.AppImage.zsync"
 	wget "https://github.com/ghostty-org/ghostty/releases/download/tip/ghostty-source.tar.gz" -O "ghostty-${GHOSTTY_VERSION}.tar.gz"
 	wget "https://github.com/ghostty-org/ghostty/releases/download/tip/ghostty-source.tar.gz.minisig" -O "ghostty-${GHOSTTY_VERSION}.tar.gz.minisig"
-	GHOSTTY_VERSION="$(tar -tf "ghostty-${GHOSTTY_VERSION}.tar.gz" --wildcards "*zig.zon.txt" | awk '-F[-/]' '{print $2"-"$3"-"$4}')"
+	GHOSTTY_VERSION="$(tar -xOf "ghostty-${GHOSTTY_VERSION}.tar.gz" --wildcards --no-wildcards-match-slash "*/VERSION" | head -n1)"
+	[ -n "${GHOSTTY_VERSION}" ] || {
+		echo "error: failed to determine Ghostty version from tarball" >&2
+		exit 1
+	}
 	echo "${GHOSTTY_VERSION}" >VERSION
 	mv ghostty-tip.tar.gz "ghostty-${GHOSTTY_VERSION}.tar.gz"
 	mv ghostty-tip.tar.gz.minisig "ghostty-${GHOSTTY_VERSION}.tar.gz.minisig"
