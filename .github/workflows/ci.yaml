@@ -171,6 +171,10 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
       - uses: actions/download-artifact@v6
         with:
           name: ghostty-appimage-aarch64
