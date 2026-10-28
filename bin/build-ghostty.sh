@@ -49,11 +49,15 @@ BUILD_ARGS="${BUILD_ARGS} -Dversion-string=${GHOSTTY_VERSION}"
 ZIG_VERSION="$(cat "ghostty-${GHOSTTY_VERSION}/build.zig.zon" | grep ".minimum_zig_version" | cut -d'"' -f2)"
 ZIG_PACKAGE_NAME="zig-${ARCH}-linux-${ZIG_VERSION}"
 
-# Determine offline cache flags based on Zig version (0.16.0 changed caching structure)
+# Point Zig at the pre-fetched offline cache. 0.16.0 changed the caching
+# structure, so older versions are fed the package dir via `--system`. From 0.16
+# on, use ZIG_GLOBAL_CACHE_DIR: 0.17.0 removed `--global-cache-dir` from
+# `zig build` (it only exists on `build-exe`/`run`), while the env var is honored
+# by every version.
 ZIG_MAJOR="$(echo "${ZIG_VERSION}" | cut -d. -f1)"
 ZIG_MINOR="$(echo "${ZIG_VERSION}" | cut -d. -f2)"
 if [ "${ZIG_MAJOR}" -gt 0 ] || [ "${ZIG_MINOR}" -ge 16 ]; then
-	BUILD_ARGS="${BUILD_ARGS} --global-cache-dir /tmp/offline-cache"
+	export ZIG_GLOBAL_CACHE_DIR=/tmp/offline-cache
 else
 	BUILD_ARGS="${BUILD_ARGS} --system /tmp/offline-cache/p"
 fi
@@ -73,6 +77,14 @@ fi
 
 (
 	cd "ghostty-${GHOSTTY_VERSION}"
-	ZIG_GLOBAL_CACHE_DIR=/tmp/offline-cache ./nix/build-support/fetch-zig-cache.sh
+	if [ "${ZIG_MAJOR}" -gt 0 ] || [ "${ZIG_MINOR}" -ge 17 ]; then
+		# 0.17's standalone `zig fetch` stores tarballs with the upstream top-level
+		# directory still nested, which the following `zig build` rejects as a hash
+		# mismatch. `zig build --fetch` fills the cache in the layout the build
+		# expects and also resolves lazy/transitive dependencies.
+		zig build --fetch=all ${BUILD_ARGS}
+	else
+		ZIG_GLOBAL_CACHE_DIR=/tmp/offline-cache ./nix/build-support/fetch-zig-cache.sh
+	fi
 	zig build ${BUILD_ARGS}
 )
